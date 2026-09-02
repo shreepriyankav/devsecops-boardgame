@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+
         stage('Compile') {
             steps {
                 sh 'mvn compile'
@@ -27,11 +28,15 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        export PATH="$PATH:$(tool 'SonarQube Scanner')/bin"
-                        sonar-scanner
-                    '''
+                script {
+                    def scannerHome = tool 'SonarQube Scanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            export PATH="${scannerHome}/bin:\$PATH"
+                            sonar-scanner
+                        """
+                    }
                 }
             }
         }
