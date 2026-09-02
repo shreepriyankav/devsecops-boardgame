@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        jdk 'Java11'
+        jdk 'Java21'
         maven 'Maven3.9.12'
     }
 
@@ -30,12 +30,12 @@ pipeline {
             steps {
                 script {
                     def scannerHome = tool 'SonarQube Scanner'
-            def java21Home = tool 'Java21'
+       
 
             withSonarQubeEnv('SonarQube') {
                 sh """
-                    export JAVA_HOME="${java21Home}"
-                    export PATH="${java21Home}/bin:${scannerHome}/bin:\$PATH"
+                    export PATH="${scannerHome}/bin:\$PATH"
+                    
 
                     java -version
                     sonar-scanner
