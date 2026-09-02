@@ -4,7 +4,6 @@ pipeline {
     tools {
         jdk 'Java11'
         maven 'Maven3.9.12'
-        sonarRunner 'SonarQube Scanner'
     }
 
     stages {
@@ -29,7 +28,10 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner'
+                    sh '''
+                        export PATH="$PATH:$(tool 'SonarQube Scanner')/bin"
+                        sonar-scanner
+                    '''
                 }
             }
         }
@@ -49,4 +51,3 @@ pipeline {
         }
     }
 }
-
