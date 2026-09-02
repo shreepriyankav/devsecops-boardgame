@@ -30,17 +30,20 @@ pipeline {
             steps {
                 script {
                     def scannerHome = tool 'SonarQube Scanner'
+            def java21Home = tool 'Java21'
 
-                    withSonarQubeEnv('SonarQube') {
-                        sh """
-                            export PATH="${scannerHome}/bin:\$PATH"
-                            sonar-scanner
-                        """
-                    }
-                }
+            withSonarQubeEnv('SonarQube') {
+                sh """
+                    export JAVA_HOME="${java21Home}"
+                    export PATH="${java21Home}/bin:${scannerHome}/bin:\$PATH"
+
+                    java -version
+                    sonar-scanner
+                """
             }
         }
-
+    }
+}
         stage('Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
