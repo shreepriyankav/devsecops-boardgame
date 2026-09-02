@@ -4,7 +4,6 @@ pipeline {
     tools {
         jdk 'Java11'
         maven 'Maven3.9.12'
-        sonarQube 'SonarQube Scanner'
     }
 
     stages {
@@ -33,15 +32,15 @@ pipeline {
                 }
             }
         }
-       
-       stage('Quality Gate') {
+
+        stage('Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
-       }
-              
+        }
+
         stage('Build') {
             steps {
                 sh 'mvn package'
@@ -49,3 +48,4 @@ pipeline {
         }
     }
 }
+
