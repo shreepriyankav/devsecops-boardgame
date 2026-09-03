@@ -86,5 +86,11 @@ pipeline {
                 '''
             }
         }
+        stage('Trivy Image Scan') {
+            steps {
+                sh 'trivy image boardgame:0.0.5'
+            }
+        }
+
     }
 }
