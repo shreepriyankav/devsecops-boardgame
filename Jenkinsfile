@@ -73,9 +73,7 @@ pipeline {
                           -Dpackaging=jar \
                           -Dfile=target/database_service_project-0.0.5-SNAPSHOT.jar \
                           -DrepositoryId=nexus \
-                          -Durl=http://172.31.27.218:8081/repository/boardgame-snapshots/ \
-                          -Dusername="$NEXUS_USERNAME" \
-                          -Dpassword="$NEXUS_PASSWORD"
+                          -Durl=http://172.31.27.218:8081/repository/boardgame-snapshots/
                     '''
                 }
             }
