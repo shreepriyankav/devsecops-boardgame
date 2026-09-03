@@ -30,20 +30,18 @@ pipeline {
             steps {
                 script {
                     def scannerHome = tool 'SonarQube Scanner'
-       
 
-            withSonarQubeEnv('SonarQube') {
-                sh """
-                    export PATH="${scannerHome}/bin:\$PATH"
-                    
-
-                    java -version
-                    sonar-scanner
-                """
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            export PATH="${scannerHome}/bin:\\$PATH"
+                            java -version
+                            sonar-scanner
+                        """
+                    }
+                }
             }
         }
-    }
-}
+
         stage('Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
@@ -55,6 +53,39 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'mvn package'
+            }
+        }
+
+        stage('Publish To Nexus') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'nexus-credentials',
+                        usernameVariable: 'NEXUS_USERNAME',
+                        passwordVariable: 'NEXUS_PASSWORD'
+                    )
+                ]) {
+                    sh '''
+                        mvn deploy:deploy-file \
+                          -DgroupId=com.javaproject \
+                          -DartifactId=database_service_project \
+                          -Dversion=0.0.5-SNAPSHOT \
+                          -Dpackaging=jar \
+                          -Dfile=target/database_service_project-0.0.5-SNAPSHOT.jar \
+                          -DrepositoryId=nexus \
+                          -Durl=http://172.31.27.218:8081/repository/boardgame-snapshots/ \
+                          -Dusername="$NEXUS_USERNAME" \
+                          -Dpassword="$NEXUS_PASSWORD"
+                    '''
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh '''
+                    docker build -t boardgame:0.0.5 .
+                '''
             }
         }
     }
