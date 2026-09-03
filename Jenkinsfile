@@ -86,11 +86,34 @@ pipeline {
                 '''
             }
         }
+
         stage('Trivy Image Scan') {
             steps {
                 sh 'trivy image boardgame:0.0.5'
             }
         }
 
+        stage('Docker Push') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )
+                ]) {
+                    sh '''
+                        docker tag boardgame:0.0.5 $DOCKER_USERNAME/boardgame:0.0.5
+
+                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+                        docker push $DOCKER_USERNAME/boardgame:0.0.5
+
+                        docker logout
+                    '''
+                }
+            }
+        }
     }
 }
+
